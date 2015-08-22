@@ -1,2 +1,3 @@
 # scapy-network-tools
-Simple network tools written with Scapy.
+
+Simple network hacking scripts written mostly in Python/Scapy.
