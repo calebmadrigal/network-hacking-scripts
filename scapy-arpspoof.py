@@ -56,15 +56,15 @@ if __name__ == '__main__':
     # Get MAC of this computer
     mac = get_if_hwaddr('eth0')
 
-    # Assume the router is 192.168.1.1
-    router_ip = '192.168.1.1'
-
     try:
         victim_ip = sys.argv[1]
 
     except IndexError:
         print("Usage: {} <victim ip>".format(sys.argv[0]))
         sys.exit(1)
+
+    # Assume the router is x.y.z.1
+    router_ip = '.'.join(victim_ip.split('.')[0:3])+'.1'
 
     original_macs = get_ip_mac_map([router_ip, victim_ip])
 
