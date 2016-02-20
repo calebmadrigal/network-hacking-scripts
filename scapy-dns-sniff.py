@@ -1,20 +1,15 @@
 #!/usr/bin/env python3
-#
-# Code from: http://bit.ly/1JwUPiM
 
 import argparse
 from scapy.all import *
 
 
-def arp_display(pkt):
-    if pkt[ARP].op == 1: #who-has (request)
-        if pkt[ARP].psrc == '0.0.0.0': # ARP Probe
-            print("ARP Probe from: " + pkt[ARP].hwsrc)
-
-
-def sniff_arpprobe(interface):
+def sniff_arpprobe(interface, host=None):
+    filter_str = 'udp port 53'
+    if host:
+        filter_str += ' and host {}'.format(host)
     try:
-        sniff(iface=interface, prn=arp_display, filter="arp", store=0)
+        sniff(iface=interface, filter=filter_str, prn=lambda p: p.summary(), store=0)
     except KeyboardInterrupt:
         pass
 
@@ -23,7 +18,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--interface', type=str, dest='interface', default='wlan0',
                         help='Network interface to use')
+    parser.add_argument('-t', '--target', type=str, dest='target',
+                        help='Target host to sniff')
     args = parser.parse_args()
     print('Sniffing for ARP Probe packets on interface: {}'.format(args.interface))
-    sniff_arpprobe(args.interface)
+    sniff_arpprobe(args.interface, args.target)
 
