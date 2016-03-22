@@ -54,7 +54,7 @@ def arp_spoof(ip1, ip2, mac, interval=10):
         time.sleep(interval)
 
 
-def do_mitm(victim_ip, router_ip, network_interface):
+def do_mitm(victim_ip, router_ip, network_interface, interval):
     # Get MAC of this computer
     mac = get_if_hwaddr(network_interface)
 
@@ -65,7 +65,7 @@ def do_mitm(victim_ip, router_ip, network_interface):
 
     set_ip_forwarding(True)
     try:
-        arp_spoof(router_ip, victim_ip, mac)
+        arp_spoof(router_ip, victim_ip, mac, interval)
     except KeyboardInterrupt:
         pass
     finally:
@@ -89,13 +89,15 @@ def main():
                         help='IP of the router. If not given, it is guessed from the victim ip')
     parser.add_argument('-i', '--interface', type=str, dest='interface', default='wlan0',
                         help='Network interface to use')
+    parser.add_argument('-s', '--sleep', type=int, dest='sleep', default=1,
+                        help='Network interface to use')
     args = parser.parse_args()
 
     if not args.router_ip:
         # Assume the router is x.y.z.1
         args.router_ip = '.'.join(args.victim_ip.split('.')[0:3])+'.1'
 
-    do_mitm(args.victim_ip, args.router_ip, args.interface)
+    do_mitm(args.victim_ip, args.router_ip, args.interface, args.sleep)
 
 
 if __name__ == '__main__':
